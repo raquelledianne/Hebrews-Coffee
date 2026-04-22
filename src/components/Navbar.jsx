@@ -5,44 +5,48 @@ import CartDrawer from "./CartDrawer";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
+  const [bounce, setBounce] = useState(false);
 
-  // updates cart badge count
+  // 🔥 cart bounce trigger
+  const triggerBounce = () => {
+    setBounce(true);
+    setTimeout(() => setBounce(false), 450);
+  };
+
   useEffect(() => {
-  const update = () => {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const updateCart = () => {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    const total = cart.reduce(
-      (sum, item) => sum + (item.quantity || 1),
-      0
-    );
+      const total = cart.reduce(
+        (sum, item) => sum + (item.quantity || 1),
+        0
+      );
 
-    setCount(total);
-  };
+      setCount(total);
+      triggerBounce();
+    };
 
-  update();
+    updateCart();
 
-  // listen to BOTH events
-  window.addEventListener("storage", update);
-  window.addEventListener("cartUpdated", update);
+    // listen for updates inside same tab + other tabs
+    window.addEventListener("storage", updateCart);
+    window.addEventListener("cartUpdated", updateCart);
 
-  return () => {
-    window.removeEventListener("storage", update);
-    window.removeEventListener("cartUpdated", update);
-  };
-}, []);
+    return () => {
+      window.removeEventListener("storage", updateCart);
+      window.removeEventListener("cartUpdated", updateCart);
+    };
+  }, []);
 
   return (
     <>
       <nav
-        style={{
-          position: "sticky",
-          top: 0,
-          background: "var(--bg)",
-          padding: "14px 16px",
-          borderBottom: "1px solid var(--border)",
-          zIndex: 1000,
-          transition: "all 0.3s ease",
-        }}
+       style={{
+  background: "var(--bg)",
+  padding: "14px 16px",
+  borderBottom: "1px solid var(--border)",
+  transition: "all 0.3s ease",
+}}
       >
         <div
           style={{
@@ -57,7 +61,7 @@ export default function Navbar() {
             Hebrews Coffee
           </strong>
 
-          {/* NAV LINKS */}
+          {/* LINKS + CART */}
           <div
             style={{
               display: "flex",
@@ -65,6 +69,7 @@ export default function Navbar() {
               flexWrap: "wrap",
               justifyContent: "center",
               fontSize: "0.95rem",
+              alignItems: "center",
             }}
           >
             <Link to="/">Home</Link>
@@ -73,8 +78,14 @@ export default function Navbar() {
             <Link to="/contact">Contact</Link>
 
             {/* CART BUTTON */}
-            <button className="btn" onClick={() => setOpen(true)}>
-              Cart ({count})
+            <button
+              className={`btn ${bounce ? "cart-bounce" : ""}`}
+              onClick={() => setOpen(true)}
+              style={{
+                position: "relative",
+              }}
+            >
+              🛒 Cart ({count})
             </button>
           </div>
         </div>
