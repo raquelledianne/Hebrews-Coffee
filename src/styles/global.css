@@ -1,0 +1,169 @@
+:root {
+  --cream: #f6efe6;
+  --coffee-dark: #3b2a22;
+  --coffee-medium: #6b4f3b;
+  --coffee-light: #7b5a42;
+  --sage: #8a9b7a;
+  --accent: #c8a96a;
+
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+/* ---------------- BASE ---------------- */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--cream);
+  color: var(--coffee-dark);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ---------------- LAYOUT ---------------- */
+
+.container {
+  width: 92%;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.section {
+  padding: 70px 0;
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding: 45px 0;
+  }
+}
+
+/* ---------------- TYPOGRAPHY ---------------- */
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  letter-spacing: 0.2px;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+}
+
+p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* ---------------- BUTTON SYSTEM ---------------- */
+
+.btn {
+  display: inline-block;
+  background: var(--coffee-medium);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.btn:hover {
+  background: var(--coffee-light);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* OUTLINE BUTTON */
+.btn-outline {
+  display: inline-block;
+  background: transparent;
+  border: 2px solid var(--coffee-medium);
+  color: var(--coffee-medium);
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background: var(--coffee-medium);
+  color: white;
+}
+
+/* ---------------- CARDS ---------------- */
+
+.card {
+  transition: all 0.2s ease;
+  border-radius: 16px;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------------- ANIMATIONS ---------------- */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------------- LOADING SPINNER ---------------- */
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e7ddd3;
+  border-top: 3px solid var(--coffee-medium);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px auto;
+}

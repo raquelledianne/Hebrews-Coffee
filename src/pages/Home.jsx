@@ -1,0 +1,54 @@
+import FeaturedDrinks from "../components/FeaturedDrinks";
+import { Link } from "react-router-dom";
+
+export default function Home() {
+  return (
+    <div>
+      {/* HERO */}
+      <section
+  style={{
+    height: "60vh",
+    minHeight: "320px", // keeps it nice on smaller screens
+    backgroundImage:
+      "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('https://images.unsplash.com/photo-1509042239860-f550ce710b93')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    color: "white",
+    padding: "0 20px",
+  }}
+>
+  <div style={{ maxWidth: "650px" }}>
+   <h1 style={{ fontSize: "clamp(2rem, 6vw, 2.6rem)", marginBottom: "12px" }}>
+      Hebrews Coffee
+    </h1>
+
+    <p style={{ fontSize: "clamp(1rem, 3vw, 1.1rem)", opacity: 0.95 }}>
+      “Find rest and be refreshed, one cup at a time.”
+    </p>
+
+    <div style={{ marginTop: "22px" }}>
+      <a href="/menu" className="btn">
+        Explore Menu
+      </a>
+    </div>
+  </div>
+</section>
+
+      {/* FEATURED DRINKS */}
+      <section className="section container">
+        <h2>Featured Drinks</h2>
+        <FeaturedDrinks />
+
+        <div style={{ marginTop: "40px", textAlign: "center" }}>
+          <Link to="/menu" className="btn">
+            View Full Menu
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
