@@ -7,23 +7,18 @@ export default function Success() {
   const [showConfetti, setShowConfetti] = useState(true);
 
   useEffect(() => {
-    const id = "HB-" + Math.floor(1000 + Math.random() * 9000);
-    setOrderId(id);
+    setOrderId("HB-" + Math.floor(1000 + Math.random() * 9000));
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setShowConfetti(false);
     }, 3000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div
-      className="container section"
-      style={{ textAlign: "center", paddingTop: "100px" }}
-    >
-      {/* CONFETTI MUST BE INSIDE RETURN */}
-      {showConfetti && (
-        <Confetti numberOfPieces={150} gravity={0.2} />
-      )}
+    <div className="container section" style={{ textAlign: "center" }}>
+      {showConfetti && <Confetti numberOfPieces={150} />}
 
       <h1>🎉 Order Confirmed!</h1>
 
@@ -32,19 +27,15 @@ export default function Success() {
       </p>
 
       <div
+        className="card"
         style={{
           marginTop: "30px",
           padding: "20px",
-          background: "#fff",
-          borderRadius: "16px",
           display: "inline-block",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
         }}
       >
         <h2>Order #{orderId}</h2>
-        <p style={{ color: "#666" }}>
-          You’ll receive your coffee soon ☕
-        </p>
+        <p>You’ll receive your coffee soon ☕</p>
       </div>
 
       <div style={{ marginTop: "30px" }}>

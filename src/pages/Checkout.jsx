@@ -1,22 +1,33 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Checkout() {
   const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const saved = localStorage.getItem("cart");
     if (saved) setCart(JSON.parse(saved));
   }, []);
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const total = cart.reduce(
+    (sum, item) => sum + (item.price || 0),
+    0
+  );
 
   function clearCart() {
     localStorage.removeItem("cart");
     setCart([]);
+  }
+
+  function placeOrder() {
+    setLoading(true);
+
+    setTimeout(() => {
+      clearCart();
+      navigate("/success");
+    }, 2000);
   }
 
   return (
@@ -30,8 +41,8 @@ export default function Checkout() {
       {cart.length === 0 ? (
         <div>
           <p>Your cart is empty.</p>
-          <Link className="btn" to="/">
-            Back to Home
+          <Link className="btn" to="/menu">
+            Back to Menu
           </Link>
         </div>
       ) : (
@@ -41,21 +52,23 @@ export default function Checkout() {
             {cart.map((item, i) => (
               <div
                 key={i}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "12px",
-                  borderBottom: "1px solid #eee",
-                }}
+                className="card"
+                 style={{
+    maxWidth: "600px",
+    background: "var(--surface)",
+    padding: "20px",
+    borderRadius: "20px",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+  }}
               >
                 <div>
                   <strong>{item.name}</strong>
-                  <div style={{ fontSize: "0.9rem", color: "#666" }}>
-                    Size: {item.size}
+                  <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+                    Size: {item.size || "Regular"}
                   </div>
                 </div>
 
-                <div>${item.price.toFixed(2)}</div>
+                <div>${(item.price || 0).toFixed(2)}</div>
               </div>
             ))}
           </div>
@@ -65,33 +78,27 @@ export default function Checkout() {
             Total: ${total.toFixed(2)}
           </h2>
 
-          {/* ACTIONS */}
-
+          {/* LOADING */}
           {loading && (
-  <div style={{ marginBottom: "15px" }}>
-    <div className="spinner"></div>
-    <p style={{ color: "#666" }}>Preparing your order...</p>
-  </div>
-)}
-         <button
-  className="btn"
-  onClick={() => {
-    setLoading(true);
+            <div style={{ marginBottom: "15px", textAlign: "center" }}>
+              <div className="spinner"></div>
+              <p>Preparing your order...</p>
+            </div>
+          )}
 
-    setTimeout(() => {
-      clearCart();
-      navigate("/success");
-    }, 2000);
-  }}
-  disabled={loading}
->
-  {loading ? "Processing..." : "Place Order"}
-</button>
+          {/* BUTTONS */}
+          <button
+            className="btn"
+            onClick={placeOrder}
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Place Order"}
+          </button>
 
           <Link
             to="/menu"
-            style={{ marginLeft: "12px" }}
             className="btn"
+            style={{ marginLeft: "12px" }}
           >
             Back to Menu
           </Link>
