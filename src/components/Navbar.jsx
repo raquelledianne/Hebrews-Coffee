@@ -5,16 +5,10 @@ import CartDrawer from "./CartDrawer";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
-  const [bounce, setBounce] = useState(false);
-
-  // 🔥 cart bounce trigger
-  const triggerBounce = () => {
-    setBounce(true);
-    setTimeout(() => setBounce(false), 450);
-  };
+  const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
-    const updateCart = () => {
+    const update = () => {
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
       const total = cart.reduce(
@@ -23,75 +17,114 @@ export default function Navbar() {
       );
 
       setCount(total);
-      triggerBounce();
+
+      // trigger bounce
+      setAnimate(true);
+      setTimeout(() => setAnimate(false), 250);
     };
 
-    updateCart();
+    update();
 
-    // listen for updates inside same tab + other tabs
-    window.addEventListener("storage", updateCart);
-    window.addEventListener("cartUpdated", updateCart);
+    window.addEventListener("cartUpdated", update);
+    window.addEventListener("storage", update);
 
     return () => {
-      window.removeEventListener("storage", updateCart);
-      window.removeEventListener("cartUpdated", updateCart);
+      window.removeEventListener("cartUpdated", update);
+      window.removeEventListener("storage", update);
     };
   }, []);
 
   return (
     <>
       <nav
-       style={{
-  background: "var(--bg)",
-  padding: "14px 16px",
-  borderBottom: "1px solid var(--border)",
-  transition: "all 0.3s ease",
-}}
+        style={{
+          background: "#f6efe6",
+          padding: "16px 20px",
+          borderBottom: "1px solid #e7ddd3",
+        }}
       >
         <div
           style={{
+            maxWidth: "1100px",
+            margin: "auto",
             display: "flex",
-            flexDirection: "column",
+            justifyContent: "space-between",
             alignItems: "center",
-            gap: "10px",
           }}
         >
           {/* BRAND */}
-          <strong style={{ fontFamily: "Playfair Display" }}>
-            Hebrews Coffee
-          </strong>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span
+              style={{
+                fontFamily: "Playfair Display",
+                fontSize: "1.3rem",
+                color: "#3b2a22",
+              }}
+            >
+              Hebrews Coffee
+            </span>
 
-          {/* LINKS + CART */}
-          <div
-            style={{
-              display: "flex",
-              gap: "14px",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              fontSize: "0.95rem",
-              alignItems: "center",
-            }}
-          >
+            <div
+              style={{
+                width: "45%",
+                height: "2px",
+                background: "#c8a96a",
+                borderRadius: "10px",
+                marginTop: "4px",
+              }}
+            />
+          </div>
+
+          {/* LINKS */}
+          <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
             <Link to="/">Home</Link>
             <Link to="/menu">Menu</Link>
             <Link to="/about">About</Link>
             <Link to="/contact">Contact</Link>
 
-            {/* CART BUTTON */}
+            {/* CART */}
             <button
-              className={`btn ${bounce ? "cart-bounce" : ""}`}
               onClick={() => setOpen(true)}
               style={{
                 position: "relative",
+                background: "#6b4f3b",
+                color: "white",
+                border: "none",
+                padding: "8px 14px",
+                borderRadius: "999px",
+                cursor: "pointer",
               }}
             >
-              🛒 Cart ({count})
+              Cart
+
+              {count > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-6px",
+                    right: "-8px",
+                    background: "#c8a96a",
+                    color: "#3b2a22",
+                    borderRadius: "50%",
+                    width: "20px",
+                    height: "20px",
+                    fontSize: "0.75rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: "600",
+                    transform: animate ? "scale(1.4)" : "scale(1)",
+                    transition: "transform 0.25s ease",
+                  }}
+                >
+                  {count}
+                </span>
+              )}
             </button>
           </div>
         </div>
       </nav>
 
-      {/* CART DRAWER */}
       <CartDrawer open={open} onClose={() => setOpen(false)} />
     </>
   );

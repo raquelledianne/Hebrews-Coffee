@@ -40,7 +40,6 @@ export default function Home() {
 
       {/* FEATURED */}
       <section className="section container">
-        <h2>Featured Drinks</h2>
 
         <FeaturedDrinks />
 

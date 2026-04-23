@@ -195,7 +195,7 @@ export default function CartDrawer({ open, onClose }) {
           <h3>Total: ${total.toFixed(2)}</h3>
 
           <Link
-            to="/checkout"
+            to="/Checkout"
             className="btn"
             style={{ width: "100%", display: "block", textAlign: "center" }}
             onClick={onClose}

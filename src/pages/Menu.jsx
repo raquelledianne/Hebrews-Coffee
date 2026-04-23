@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 
 /* ---------------- MENU DATA ---------------- */
 
@@ -21,23 +21,6 @@ const menuData = [
       { name: "Armor of God Mocha", desc: "Bold dark chocolate mocha", price: 5.5, tag: "Bold" },
       { name: "Grace and Grounds", desc: "Sweet cream cold brew", price: 4.25, tag: "Iced" },
       { name: "The Elijah Energy", desc: "Extra-shot latte for strength", price: 5.25, tag: "Strong" },
-    ],
-  },
-  {
-    section: "The Parables (Specialty Creations)",
-    items: [
-      { name: "Proverbs Pour-Over", desc: "Butterscotch oatmilk latte", price: 5.0 },
-      { name: "The Promise Blend", desc: "Cherry-chocolate seasonal roast", price: 5.25, tag: "Seasonal" },
-      { name: "Good News Latte", desc: "Cookie butter + cinnamon latte", price: 5.5 },
-    ],
-  },
-  {
-    section: "The Psalms (Comfort Drinks)",
-    items: [
-      { name: "Burning Bush Chai", desc: "Spiced chai latte with warmth", price: 4.75 },
-      { name: "The Shepherd's Blend", desc: "Smooth low-acidity coffee", price: 3.75 },
-      { name: "Genesis Glow", desc: "Light roast citrus notes", price: 3.95 },
-      { name: "Saved and Caffeinated", desc: "Iced coffee with cream + syrup", price: 4.25, tag: "Iced" },
     ],
   },
 ];
@@ -74,19 +57,19 @@ export default function Menu() {
 
     localStorage.setItem("cart", JSON.stringify(updated));
 
-    // trigger navbar update
+    // notify navbar instantly
     window.dispatchEvent(new Event("cartUpdated"));
 
-    setToast(`${item.name} added to cart ☕`);
+    setToast(`${item.name} added ☕`);
 
-    setTimeout(() => setToast(""), 1400);
+    setTimeout(() => setToast(""), 1200);
   }
 
   return (
     <div className="container section">
-      <h1 style={{ marginBottom: "10px" }}>The Menu</h1>
+      <h1>The Menu</h1>
 
-      <p style={{ fontStyle: "italic", marginBottom: "40px" }}>
+      <p style={{ fontStyle: "italic", marginBottom: "30px" }}>
         “More than coffee - it’s community”
       </p>
 
@@ -110,11 +93,10 @@ export default function Menu() {
         </div>
       )}
 
-      {/* SECTIONS */}
-      {menuData.map((section, idx) => (
-        <MenuSection key={idx} title={section.section}>
-          {section.items.map((item, i) => (
-            <Item key={i} item={item} onAdd={addToCart} />
+      {menuData.map((section, i) => (
+        <MenuSection key={i} title={section.section}>
+          {section.items.map((item, j) => (
+            <SwipeItem key={j} item={item} onAdd={addToCart} />
           ))}
         </MenuSection>
       ))}
@@ -131,94 +113,86 @@ function MenuSection({ title, children }) {
         marginBottom: "40px",
         padding: "24px",
         background: "var(--surface)",
-        borderRadius: "16px",
         border: "1px solid var(--border)",
-        boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
+        borderRadius: "16px",
       }}
     >
-      <h2 style={{ marginBottom: "16px" }}>{title}</h2>
+      <h2 style={{ marginBottom: "14px" }}>{title}</h2>
       <div style={{ display: "grid", gap: "12px" }}>{children}</div>
     </div>
   );
 }
 
-/* ---------------- ITEM ---------------- */
+/* ---------------- SWIPE ITEM (UPGRADED) ---------------- */
 
-function Item({ item, onAdd }) {
+function SwipeItem({ item, onAdd }) {
   const startX = useRef(0);
-  const [swiping, setSwiping] = useState(false);
   const [swipeX, setSwipeX] = useState(0);
+  const [swiping, setSwiping] = useState(false);
 
-  const SWIPE_THRESHOLD = 80;
+  const THRESHOLD = 80;
+  const MAX = 140;
 
-  function handleTouchStart(e) {
+  function handleStart(e) {
     startX.current = e.touches[0].clientX;
     setSwiping(true);
   }
 
-  function handleTouchMove(e) {
+  function handleMove(e) {
     if (!swiping) return;
 
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - startX.current;
+    const diff = e.touches[0].clientX - startX.current;
 
     if (diff > 0) {
-      setSwipeX(diff);
+      setSwipeX(Math.min(diff, MAX));
     }
   }
 
-  function handleTouchEnd() {
+  function handleEnd() {
     setSwiping(false);
 
-    if (swipeX > SWIPE_THRESHOLD) {
+    if (swipeX > THRESHOLD) {
       onAdd(item);
     }
 
     setSwipeX(0);
   }
 
+  const progress = Math.min(swipeX / THRESHOLD, 1);
+
   return (
     <div
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      onTouchStart={handleStart}
+      onTouchMove={handleMove}
+      onTouchEnd={handleEnd}
       style={{
         position: "relative",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        gap: "16px",
         padding: "14px 16px",
         borderRadius: "12px",
         background: "var(--bg)",
         border: "1px solid var(--border)",
         overflow: "hidden",
+
         transform: `translateX(${swipeX}px)`,
-        transition: swiping ? "none" : "transform 0.2s ease",
+        transition: swiping ? "none" : "transform 0.25s ease",
       }}
     >
-      {/* SWIPE HINT BACKGROUND */}
-      {swipeX > 10 && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "#8a9b7a",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            paddingLeft: "16px",
-            color: "white",
-            fontWeight: "bold",
-            zIndex: 0,
-          }}
-        >
-          ➕ Add to Cart
-        </div>
-      )}
+      {/* PROGRESS BACKGROUND */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "#8a9b7a",
+          opacity: progress * 0.9,
+          zIndex: 0,
+        }}
+      />
 
-      {/* LEFT SIDE */}
-      <div style={{ flex: 1, position: "relative", zIndex: 1 }}>
+      {/* LEFT CONTENT */}
+      <div style={{ flex: 1, position: "relative", zIndex: 2 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <strong>{item.name}</strong>
 
@@ -230,7 +204,6 @@ function Item({ item, onAdd }) {
                 borderRadius: "999px",
                 background: "#8a9b7a",
                 color: "white",
-                whiteSpace: "nowrap",
               }}
             >
               {item.tag}
@@ -238,17 +211,17 @@ function Item({ item, onAdd }) {
           )}
         </div>
 
-        <span style={{ fontSize: "0.9rem", opacity: 0.7 }}>
+        <div style={{ fontSize: "0.9rem", opacity: 0.7 }}>
           {item.desc}
-        </span>
+        </div>
 
         <div style={{ marginTop: "6px", fontWeight: 600 }}>
           ${item.price.toFixed(2)}
         </div>
       </div>
 
-      {/* RIGHT SIDE */}
-      <div style={{ position: "relative", zIndex: 1 }}>
+      {/* RIGHT BUTTON */}
+      <div style={{ position: "relative", zIndex: 2 }}>
         <button className="btn" onClick={() => onAdd(item)}>
           Order
         </button>

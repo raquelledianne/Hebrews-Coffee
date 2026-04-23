@@ -29,7 +29,6 @@ const drinks = [
 
 export default function FeaturedDrinks() {
   const [toast, setToast] = useState("");
-  const [addedItems, setAddedItems] = useState({});
 
   function addToCart(item) {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -58,23 +57,43 @@ export default function FeaturedDrinks() {
 
     localStorage.setItem("cart", JSON.stringify(updated));
 
-    // 🔥 notify navbar + cart drawer
+    // 🔥 trigger navbar update + bounce
     window.dispatchEvent(new Event("cartUpdated"));
 
-    // ✨ toast message
     setToast(`${item.name} added ☕`);
-    setTimeout(() => setToast(""), 1500);
-
-    // ✨ button morph state
-    setAddedItems((prev) => ({ ...prev, [item.name]: true }));
-
-    setTimeout(() => {
-      setAddedItems((prev) => ({ ...prev, [item.name]: false }));
-    }, 1200);
+    setTimeout(() => setToast(""), 1200);
   }
 
   return (
     <div>
+      {/* HEADER */}
+      <div style={{ marginBottom: "20px" }}>
+        <h2
+          style={{
+            fontFamily: "Playfair Display",
+            fontSize: "1.8rem",
+            color: "#3b2a22",
+            marginBottom: "6px",
+          }}
+        >
+          Featured Drinks
+        </h2>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div
+            style={{
+              width: "40px",
+              height: "2px",
+              background: "#c8a96a",
+              borderRadius: "10px",
+            }}
+          />
+          <span style={{ fontSize: "0.85rem", color: "#6b4f3b" }}>
+            handcrafted favorites from Hebrews Coffee
+          </span>
+        </div>
+      </div>
+
       {/* TOAST */}
       {toast && (
         <div
@@ -88,8 +107,6 @@ export default function FeaturedDrinks() {
             padding: "10px 16px",
             borderRadius: "12px",
             zIndex: 9999,
-            boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-            animation: "fadeUp 0.3s ease",
           }}
         >
           {toast}
@@ -104,79 +121,37 @@ export default function FeaturedDrinks() {
           gap: "18px",
         }}
       >
-        {drinks.map((d, i) => {
-          const isAdded = addedItems[d.name];
+        {drinks.map((d, i) => (
+          <div key={i} className="card">
+            <div
+              style={{
+                height: "170px",
+                backgroundImage: `url(${d.img})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
 
-          return (
-            <div key={i} className="card" style={{ overflow: "hidden" }}>
-              {/* IMAGE */}
+            <div style={{ padding: "14px" }}>
+              <strong>{d.name}</strong>
+              <p style={{ fontSize: "0.9rem" }}>{d.desc}</p>
+
               <div
                 style={{
-                  height: "170px",
-                  backgroundImage: `url(${d.img})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  position: "relative",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                      "linear-gradient(to top, rgba(0,0,0,0.6), transparent)",
-                  }}
-                />
+                <strong>${d.price.toFixed(2)}</strong>
 
-                <h3
-                  style={{
-                    position: "absolute",
-                    bottom: "10px",
-                    left: "12px",
-                    color: "white",
-                    margin: 0,
-                  }}
-                >
-                  {d.name}
-                </h3>
-              </div>
-
-              {/* CONTENT */}
-              <div style={{ padding: "14px" }}>
-                <p style={{ fontSize: "0.9rem", marginBottom: "10px" }}>
-                  {d.desc}
-                </p>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <strong>${d.price.toFixed(2)}</strong>
-
-                  {/* ✨ MORPHING BUTTON */}
-                  <button
-                    className="btn"
-                    onClick={() => addToCart(d)}
-                    disabled={isAdded}
-                    style={{
-                      minWidth: "110px",
-                      transition: "all 0.25s ease",
-                      transform: isAdded ? "scale(1.05)" : "scale(1)",
-                      background: isAdded ? "#2e7d32" : undefined,
-                      opacity: isAdded ? 0.9 : 1,
-                      cursor: isAdded ? "default" : "pointer",
-                    }}
-                  >
-                    {isAdded ? "Added ✓" : "Order"}
-                  </button>
-                </div>
+                <button className="btn" onClick={() => addToCart(d)}>
+                  Order
+                </button>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
