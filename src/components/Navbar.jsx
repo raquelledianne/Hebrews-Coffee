@@ -4,6 +4,8 @@ import CartDrawer from "./CartDrawer";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
+
   const [count, setCount] = useState(0);
   const [animate, setAnimate] = useState(false);
 
@@ -18,7 +20,6 @@ export default function Navbar() {
 
       setCount(total);
 
-      // trigger bounce
       setAnimate(true);
       setTimeout(() => setAnimate(false), 250);
     };
@@ -41,6 +42,7 @@ export default function Navbar() {
           background: "#f6efe6",
           padding: "16px 20px",
           borderBottom: "1px solid #e7ddd3",
+          position: "relative",
         }}
       >
         <div
@@ -75,54 +77,88 @@ export default function Navbar() {
             />
           </div>
 
-          {/* LINKS */}
-          <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-            <Link to="/">Home</Link>
-            <Link to="/menu">Menu</Link>
-            <Link to="/about">About</Link>
-            <Link to="/contact">Contact</Link>
+   {/* LINKS */}
+<div className="nav-links" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+  
+  <Link to="/">Home</Link>
+  <Link to="/menu">Menu</Link>
+  <Link to="/about">About</Link>
+  <Link to="/contact">Contact</Link>
 
-            {/* CART */}
+  {/* CART */}
+  <button
+    onClick={() => setOpen(true)}
+    style={{
+      position: "relative",
+      background: "#6b4f3b",
+      color: "white",
+      border: "none",
+      padding: "8px 14px",
+      borderRadius: "999px",
+      cursor: "pointer",
+    }}
+  >
+    Cart
+
+    {count > 0 && (
+      <span
+        style={{
+          position: "absolute",
+          top: "-6px",
+          right: "-8px",
+          background: "#c8a96a",
+          color: "#3b2a22",
+          borderRadius: "50%",
+          width: "20px",
+          height: "20px",
+          fontSize: "0.75rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: "600",
+          transform: animate ? "scale(1.4)" : "scale(1)",
+          transition: "transform 0.25s ease",
+        }}
+      >
+        {count}
+      </span>
+    )}
+  </button>
+</div>
+          {/* HAMBURGER (mobile only) */}
+          <button
+            className="hamburger"
+            onClick={() => setMobileMenu(!mobileMenu)}
+          >
+            ☰
+          </button>
+        </div>
+
+        {/* MOBILE MENU */}
+        {mobileMenu && (
+          <div className="mobile-menu">
+            <Link to="/" onClick={() => setMobileMenu(false)}>Home</Link>
+            <Link to="/menu" onClick={() => setMobileMenu(false)}>Menu</Link>
+            <Link to="/about" onClick={() => setMobileMenu(false)}>About</Link>
+            <Link to="/contact" onClick={() => setMobileMenu(false)}>Contact</Link>
+
             <button
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setOpen(true);
+                setMobileMenu(false);
+              }}
               style={{
-                position: "relative",
                 background: "#6b4f3b",
                 color: "white",
                 border: "none",
                 padding: "8px 14px",
                 borderRadius: "999px",
-                cursor: "pointer",
               }}
             >
-              Cart
-
-              {count > 0 && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-6px",
-                    right: "-8px",
-                    background: "#c8a96a",
-                    color: "#3b2a22",
-                    borderRadius: "50%",
-                    width: "20px",
-                    height: "20px",
-                    fontSize: "0.75rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: "600",
-                    transform: animate ? "scale(1.4)" : "scale(1)",
-                    transition: "transform 0.25s ease",
-                  }}
-                >
-                  {count}
-                </span>
-              )}
+              Cart ({count})
             </button>
           </div>
-        </div>
+        )}
       </nav>
 
       <CartDrawer open={open} onClose={() => setOpen(false)} />

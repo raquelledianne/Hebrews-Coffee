@@ -4,56 +4,82 @@ import { Link } from "react-router-dom";
 export default function CartDrawer({ open, onClose }) {
   const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    const loadCart = () => {
-      const saved = JSON.parse(localStorage.getItem("cart")) || [];
-      setCart(saved);
-    };
+  const loadCart = () => {
+    const saved = JSON.parse(localStorage.getItem("cart")) || [];
 
+    const grouped = Object.values(
+      saved.reduce((acc, item) => {
+        const key = `${item.name}-${item.size || "Regular"}`;
+
+        if (!acc[key]) {
+          acc[key] = {
+            ...item,
+            size: item.size || "Regular",
+            quantity: item.quantity || 1,
+          };
+        } else {
+          acc[key].quantity += item.quantity || 1;
+        }
+
+        return acc;
+      }, {})
+    );
+
+    setCart(grouped);
+  };
+
+  useEffect(() => {
     loadCart();
 
+    window.addEventListener("cartUpdated", loadCart);
     window.addEventListener("storage", loadCart);
-    return () => window.removeEventListener("storage", loadCart);
+
+    return () => {
+      window.removeEventListener("cartUpdated", loadCart);
+      window.removeEventListener("storage", loadCart);
+    };
   }, [open]);
 
-  // 🔥 notify navbar instantly
-  const emitCartUpdate = () => {
+  // ➕ / ➖ quantity update
+  const updateQty = (name, size, delta) => {
+    const raw = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const updated = raw
+      .map((item) => {
+        if (item.name === name && (item.size || "Regular") === size) {
+          return {
+            ...item,
+            quantity: (item.quantity || 1) + delta,
+          };
+        }
+        return item;
+      })
+      .filter((item) => item.quantity > 0); // auto remove if 0
+
+    localStorage.setItem("cart", JSON.stringify(updated));
+    window.dispatchEvent(new Event("cartUpdated"));
+  };
+
+  // ❌ remove item completely
+  const removeItem = (name, size) => {
+    const raw = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const updated = raw.filter(
+      (item) =>
+        !(item.name === name && (item.size || "Regular") === size)
+    );
+
+    localStorage.setItem("cart", JSON.stringify(updated));
     window.dispatchEvent(new Event("cartUpdated"));
   };
 
   const total = cart.reduce(
-    (sum, item) => sum + item.price * (item.quantity || 1),
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  const updateQty = (name, delta) => {
-    const updated = cart.map((item) =>
-      item.name === name
-        ? {
-            ...item,
-            quantity: Math.max(1, (item.quantity || 1) + delta),
-          }
-        : item
-    );
-
-    setCart(updated);
-    localStorage.setItem("cart", JSON.stringify(updated));
-
-    emitCartUpdate();
-  };
-
-  const removeItem = (name) => {
-    const updated = cart.filter((item) => item.name !== name);
-
-    setCart(updated);
-    localStorage.setItem("cart", JSON.stringify(updated));
-
-    emitCartUpdate();
-  };
-
   return (
     <>
-      {/* BACKDROP */}
       {open && (
         <div
           onClick={onClose}
@@ -66,57 +92,30 @@ export default function CartDrawer({ open, onClose }) {
         />
       )}
 
-      {/* DRAWER */}
       <div
         style={{
           position: "fixed",
           top: 0,
           right: open ? 0 : "-100%",
           width: "360px",
-          maxWidth: "100vw",
           height: "100vh",
-
-          background: "#ffffff",
-          color: "#3b2a22",
-
-          borderLeft: "1px solid rgba(0,0,0,0.08)",
-          boxShadow: "-20px 0 50px rgba(0,0,0,0.25)",
-
+          background: "#fff",
           zIndex: 2000,
+          transition: "right 0.35s ease",
           display: "flex",
           flexDirection: "column",
-
-          transition: "right 0.35s ease",
         }}
       >
         {/* HEADER */}
-        <div
-          style={{
-            padding: "16px",
-            borderBottom: "1px solid #eee",
-          }}
-        >
+        <div style={{ padding: 16, borderBottom: "1px solid #eee" }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <h2 style={{ margin: 0 }}>Your Order</h2>
-
-            <button className="btn" onClick={onClose}>
-              ✕
-            </button>
+            <h2>Your Order</h2>
+            <button className="btn" onClick={onClose}>✕</button>
           </div>
-
-          <p style={{ fontSize: "0.85rem", opacity: 0.6 }}>
-            Hebrews Coffee • pickup order
-          </p>
         </div>
 
         {/* ITEMS */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "12px",
-          }}
-        >
+        <div style={{ flex: 1, overflowY: "auto", padding: 12 }}>
           {cart.length === 0 ? (
             <p style={{ textAlign: "center", opacity: 0.6 }}>
               Your cart is empty ☕
@@ -126,55 +125,58 @@ export default function CartDrawer({ open, onClose }) {
               <div
                 key={i}
                 className="card"
-                style={{
-                  padding: "12px",
-                  marginBottom: "10px",
-                }}
+                style={{ padding: 12, marginBottom: 10 }}
               >
                 <strong>{item.name}</strong>
 
-                <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>
-                  ${item.price.toFixed(2)}
+                <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>
+                  Size: {item.size}
                 </div>
 
-                {/* qty */}
+                <div style={{ marginTop: 4 }}>
+                  ${(item.price * item.quantity).toFixed(2)}
+                </div>
+
+                {/* CONTROLS */}
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "10px",
-                    marginTop: "8px",
+                    marginTop: "10px",
                   }}
                 >
                   <button
                     className="btn"
-                    onClick={() => updateQty(item.name, -1)}
+                    onClick={() =>
+                      updateQty(item.name, item.size, -1)
+                    }
                   >
-                    -
+                    −
                   </button>
 
-                  <span>{item.quantity || 1}</span>
+                  <span>{item.quantity}</span>
 
                   <button
                     className="btn"
-                    onClick={() => updateQty(item.name, 1)}
+                    onClick={() =>
+                      updateQty(item.name, item.size, 1)
+                    }
                   >
                     +
                   </button>
                 </div>
 
-                {/* remove */}
+                {/* REMOVE */}
                 <button
-                  onClick={() => removeItem(item.name)}
+                  onClick={() => removeItem(item.name, item.size)}
                   style={{
-                    marginTop: "10px",
+                    marginTop: "8px",
+                    fontSize: "0.8rem",
                     background: "transparent",
-                    border: "1px solid #c8a96a",
-                    color: "#6b4f3b",
-                    padding: "6px 10px",
-                    borderRadius: "10px",
+                    border: "none",
+                    color: "#a44",
                     cursor: "pointer",
-                    fontSize: "0.85rem",
                   }}
                 >
                   Remove
@@ -185,21 +187,10 @@ export default function CartDrawer({ open, onClose }) {
         </div>
 
         {/* FOOTER */}
-        <div
-          style={{
-            borderTop: "1px solid #eee",
-            padding: "16px",
-            background: "#fff",
-          }}
-        >
+        <div style={{ padding: 16, borderTop: "1px solid #eee" }}>
           <h3>Total: ${total.toFixed(2)}</h3>
 
-          <Link
-            to="/Checkout"
-            className="btn"
-            style={{ width: "100%", display: "block", textAlign: "center" }}
-            onClick={onClose}
-          >
+          <Link to="/checkout" className="btn" onClick={onClose}>
             Checkout
           </Link>
         </div>

@@ -126,3 +126,58 @@ a:hover {
 .cart-bounce {
   animation: cartBounce 0.45s ease;
 }
+
+.modal-sheet {
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0.85;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* HIDE hamburger on desktop */
+.hamburger {
+  display: none;
+  font-size: 26px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #3b2a22;
+}
+
+/* MOBILE MENU */
+.mobile-menu {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+
+  background: #f6efe6;
+  border: 1px solid #e7ddd3;
+  border-radius: 14px;
+
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  min-width: 180px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* MOBILE ONLY */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+  }
+}
