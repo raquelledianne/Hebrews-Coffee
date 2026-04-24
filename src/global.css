@@ -17,10 +17,182 @@
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: var(--bg);
+  background: 
+    radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(var(--cream), var(--cream));
+
+  background-size: 18px 18px, 100%;
   color: var(--text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+.section-divider {
+  width: 60px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 999px;
+  margin: 18px 0 28px 0;
+  opacity: 0.9;
+}
+
+.nav-link {
+  display: inline-block;
+  position: relative;
+
+  padding: 6px 8px;
+  border-radius: 8px;
+
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+/* THIS is the lift effect you lost */
+.nav-link:hover {
+  transform: translateY(-3px);
+  color: var(--coffee-medium);
+  background: rgba(200, 169, 106, 0.12);
+}
+
+/* subtle underline (optional but matches your theme) */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  bottom: 2px;
+  width: 0%;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
+.nav-link:hover::after {
+  width: 80%;
+}
+
+.cart-btn {
+  position: relative;
+  background: var(--coffee-medium);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* hover = lift + glow */
+.cart-btn:hover {
+  transform: translateY(-3px);
+  background: var(--coffee-light);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+}
+
+/* click feel */
+.cart-btn:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+/* =========================
+   HERO STEAM EFFECT
+   ========================= */
+
+.steam-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+
+  /* slight global shift left for composition */
+  transform: translateX(-20px);
+}
+
+/* shared steam style */
+.steam-container::before,
+.steam-container::after,
+.steam-container span {
+  content: "";
+  position: absolute;
+
+  /* 🔥 higher placement (behind title area) */
+  bottom: 35%;
+
+  width: 80px;
+  height: 220px;
+
+  /* more visible but still soft */
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 50px rgba(255, 255, 255, 0.28);
+
+  filter: blur(24px);
+  border-radius: 50%;
+
+  opacity: 0;
+
+  animation: steamRise 6.5s infinite ease-in-out;
+}
+
+/* LEFT steam */
+.steam-container::before {
+  left: 38%;
+  animation-delay: 0s;
+  width: 70px;
+  height: 210px;
+}
+
+.steam-container span {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 200px;
+  animation-delay: 1.8s;
+}
+
+.steam-container::after {
+  left: 56%;
+  animation-delay: 3.6s;
+  width: 90px;
+  height: 240px;
+}
+
+/* =========================
+   STEAM ANIMATION
+   ========================= */
+
+@keyframes steamRise {
+  0% {
+    transform: translate(0px, 0px) scale(0.9);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.55;
+  }
+
+  /* gentle left drift */
+  30% {
+    transform: translate(-10px, -60px) scale(1.05);
+    opacity: 0.4;
+  }
+
+  /* slight right correction (natural wobble) */
+  55% {
+    transform: translate(8px, -160px) scale(1.15);
+    opacity: 0.28;
+  }
+
+  /* drift back left while fading */
+  80% {
+    transform: translate(-6px, -260px) scale(1.3);
+    opacity: 0.12;
+  }
+
+  100% {
+    transform: translate(4px, -340px) scale(1.45);
+    opacity: 0;
+  }
 }
 
 /* layout */
@@ -153,31 +325,241 @@ a:hover {
 }
 
 /* MOBILE MENU */
-.mobile-menu {
-  position: absolute;
-  top: 70px;
-  right: 20px;
 
-  background: #f6efe6;
-  border: 1px solid #e7ddd3;
-  border-radius: 14px;
-
-  padding: 14px;
+.nav-links {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  min-width: 180px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  gap: 16px;
+  align-items: center;
 }
 
-/* MOBILE ONLY */
-@media (max-width: 768px) {
+/* MOBILE (460px and below) */
+@media (max-width: 460px) {
   .nav-links {
-    display: none;
+    display: none !important;
   }
 
   .hamburger {
     display: block;
+  }
+}
+
+/* DRAWER BASE */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+
+  height: 100vh;
+  width: 300px;
+
+  background: rgba(246, 239, 230, 0.92);
+  backdrop-filter: blur(12px);
+
+  border-left: 1px solid #e7ddd3;
+
+  box-shadow: -10px 0 35px rgba(0,0,0,0.18);
+
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 18px;
+animation: slideInDrawer 0.28s ease forwards;
+  overflow: hidden; /* important for steam */
+}
+
+/* SLIDE ANIMATION */
+@keyframes slideInDrawer {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* HEADER */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-family: "Playfair Display", serif;
+  font-size: 1.2rem;
+
+  margin-bottom: 20px;
+}
+
+/* LINKS */
+.drawer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.drawer-links a {
+  font-size: 1.05rem;
+  padding: 10px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.drawer-links a:hover {
+  background: rgba(107, 79, 59, 0.08);
+  transform: translateX(4px);
+}
+
+.drawer-header,
+.drawer-links,
+.drawer-cart {
+  position: relative;
+  z-index: 2;
+}
+
+/* CART BUTTON */
+.drawer-cart {
+  margin-top: auto;
+
+  background: #6b4f3b;
+  color: white;
+
+  border: none;
+  padding: 12px;
+  border-radius: 999px;
+
+  cursor: pointer;
+  font-weight: 500;
+
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+  transition: 0.2s ease;
+}
+
+.drawer-cart:hover {
+  transform: translateY(-2px);
+  background: #7b5a42;
+}
+
+.drawer-close {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(107, 79, 59, 0.08);
+  border: 1px solid rgba(107, 79, 59, 0.15);
+
+  color: #3b2a22;
+  font-size: 18px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.drawer-close:hover {
+  background: rgba(107, 79, 59, 0.15);
+  transform: rotate(90deg) scale(1.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.drawer-close:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+/* =========================
+   MOBILE DRAWER STEAM (FIXED PREMIUM VERSION)
+   ========================= */
+
+.drawer-steam {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* base steam blob */
+.drawer-steam-blob {
+  position: absolute;
+  bottom: 6%;
+
+  width: 90px;
+  height: 240px;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(200, 169, 106, 0.18) 45%,
+    transparent 75%
+  );
+
+  filter: blur(30px);
+  border-radius: 50%;
+
+  opacity: 0;
+
+  animation: drawerSteamFloat 7.2s infinite ease-in-out;
+}
+
+/* LEFT */
+.drawer-steam-blob.s1 {
+  left: 26%;
+  width: 60px;
+  height: 170px;
+  animation-delay: 0s;
+}
+
+/* CENTER */
+.drawer-steam-blob.s2 {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 260px;
+  animation-delay: 2.4s;
+}
+
+/* RIGHT */
+.drawer-steam-blob.s3 {
+  left: 72%;
+  width: 70px;
+  height: 200px;
+  animation-delay: 4.8s;
+}
+
+/* animation */
+@keyframes drawerSteamFloat {
+  0% {
+    transform: translateY(0px) translateX(0px) scale(0.9);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.55;
+  }
+
+  35% {
+    transform: translateY(-120px) translateX(-10px) scale(1.05);
+    opacity: 0.35;
+  }
+
+  60% {
+    transform: translateY(-240px) translateX(12px) scale(1.15);
+    opacity: 0.2;
+  }
+
+  85% {
+    transform: translateY(-340px) translateX(-8px) scale(1.3);
+    opacity: 0.08;
+  }
+
+  100% {
+    transform: translateY(-420px) translateX(6px) scale(1.45);
+    opacity: 0;
   }
 }
