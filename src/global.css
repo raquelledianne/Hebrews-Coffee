@@ -369,6 +369,17 @@ animation: slideInDrawer 0.28s ease forwards;
   overflow: hidden; /* important for steam */
 }
 
+.mobile-drawer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(59, 42, 34, 0.08),
+    transparent 40%
+  );
+  z-index: 0;
+}
 /* SLIDE ANIMATION */
 @keyframes slideInDrawer {
   from {
@@ -473,33 +484,34 @@ animation: slideInDrawer 0.28s ease forwards;
 }
 
 /* =========================
-   MOBILE DRAWER STEAM (FIXED PREMIUM VERSION)
+   MOBILE DRAWER STEAM 
    ========================= */
 
 .drawer-steam {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
   overflow: hidden;
 }
 
 /* base steam blob */
 .drawer-steam-blob {
   position: absolute;
-  bottom: 6%;
+  bottom: 50%;
 
   width: 90px;
   height: 240px;
 
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(200, 169, 106, 0.18) 45%,
-    transparent 75%
+    rgba(243, 223, 223, 0.55) 0%,
+    rgba(197, 150, 57, 0.35) 45%,
+    rgba(105, 68, 42, 0.15) 70%,
+    transparent 80%
   );
 
-  filter: blur(30px);
+  filter: blur(22px);
   border-radius: 50%;
 
   opacity: 0;
@@ -540,12 +552,12 @@ animation: slideInDrawer 0.28s ease forwards;
   }
 
   15% {
-    opacity: 0.55;
+    opacity: 0.75;
   }
 
   35% {
+    opacity: 0.5;
     transform: translateY(-120px) translateX(-10px) scale(1.05);
-    opacity: 0.35;
   }
 
   60% {
